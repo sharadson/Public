@@ -7,6 +7,12 @@ This is a bare-bones technical design document to show approach taken to design 
 
 https://docs.google.com/document/d/1sGKgSmBb_ToKRtpAk9-h7aiEMhX1TOfyJMX4Cw41A3Q/edit?usp=sharing
 
+## How to Run
+Command to run the Inventory Management Server:
+~/Python/InventoryManagement/dist/app
+
+Once server is running, you can open other terminal window to run commands under API Endpoints. Or you can also use Postman to access these endpoints (by sending the json request data in each of the requests below)
+
 ## API Endpoints
 
 ### Purchase Agreement (PA)
