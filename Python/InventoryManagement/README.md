@@ -2,7 +2,7 @@
 
 Welcome to the Inventory Management System project! This system allows you to manage Purchase Agreements (PA) and Purchase Orders (PO) for different plants and vendors. You can use the provided API endpoints to interact with the system.
 
-## Design document
+## Technical Design Document
 This is a bare-bones technical design document to show approach taken to design technical solution to this problem.
 
 https://docs.google.com/document/d/1sGKgSmBb_ToKRtpAk9-h7aiEMhX1TOfyJMX4Cw41A3Q/edit?usp=sharing
