@@ -10,9 +10,9 @@ class Agreement(Base):
     agreement_id = Column(Integer, primary_key=True, autoincrement=True)
     plant_id = Column(Integer, ForeignKey('plant.plant_id'), nullable=False)
     vendor_id = Column(Integer, ForeignKey('vendor.vendor_id'), nullable=False)
-    agreement_date = Column(Date)
-    agreement_start = Column(Date)
-    agreement_end = Column(Date)
+    agreement_date = Column(Date, nullable=False)
+    agreement_start = Column(Date, nullable=False)
+    agreement_end = Column(Date, nullable=False)
     quantity = Column(Integer, nullable=False)
     orders = relationship('Order', back_populates='agreement')
     # we skip to back populate agreements on plant there can be too many agreements for a given plant

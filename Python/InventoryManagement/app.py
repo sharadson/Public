@@ -52,7 +52,7 @@ def create_purchase_order():
     data = request.json
     agreement_id = int(data['agreement_id']) if 'agreement_id' in data else None
     vendor_id = int(data['vendor_id']) if 'vendor_id' in data else None
-    plant_id = int(data['plant_id'])
+    plant_id = int(data['plant_id']) if 'plant_id' in data else None
     order_date = datetime.strptime(data['order_date'], '%Y-%m-%d').date()
     quantity = int(data['quantity'])
     order = inventory_manager.create_purchase_order(
