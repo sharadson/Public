@@ -39,65 +39,69 @@ class InventoryManagerTest(unittest.TestCase):
             os.remove(db_file)
 
     def test_get_oldest_received_plant(self):
-        agreement_id = self.inventory_manager.create_purchase_agreement(
+        agreement = self.inventory_manager.create_purchase_agreement(
             plant_id=self.plant.plant_id, vendor_id=self.vendor.vendor_id,
             start=date.today() - timedelta(days=35), end=date.today() + timedelta(days=365), quantity=1000
         )
-        order_id_1 = self.inventory_manager.create_purchase_order(
-            quantity=100, order_date=date.today() - timedelta(days=5), agreement_id=agreement_id
+        order_1 = self.inventory_manager.create_purchase_order(
+            quantity=100, order_date=date.today() - timedelta(days=5), agreement_id=agreement.agreement_id
         )
-        self.inventory_manager.receive_purchase_order(order_id_1,
-                                                      delivery_date=date.today() - timedelta(days=5))
+        self.inventory_manager.receive_purchase_order(
+            order_1.order_id, delivery_date=date.today() - timedelta(days=5)
+        )
 
         # oldest received plant
-        order_id_2 = self.inventory_manager.create_purchase_order(
-            quantity=100, order_date=date.today() - timedelta(days=10), agreement_id=agreement_id
+        order_2 = self.inventory_manager.create_purchase_order(
+            quantity=100, order_date=date.today() - timedelta(days=10), agreement_id=agreement.agreement_id
         )
-        self.inventory_manager.receive_purchase_order(order_id_2,
-                                                      delivery_date=date.today() - timedelta(days=10))
+        self.inventory_manager.receive_purchase_order(
+            order_2.order_id, delivery_date=date.today() - timedelta(days=10)
+        )
 
-        order_id_3 = self.inventory_manager.create_purchase_order(
-            quantity=100, order_date=date.today() - timedelta(days=2), agreement_id=agreement_id
+        order_3 = self.inventory_manager.create_purchase_order(
+            quantity=100, order_date=date.today() - timedelta(days=2), agreement_id=agreement.agreement_id
         )
-        self.inventory_manager.receive_purchase_order(order_id_3,
-                                                      delivery_date=date.today() - timedelta(days=2))
+        self.inventory_manager.receive_purchase_order(
+            order_3.order_id, delivery_date=date.today() - timedelta(days=2)
+        )
 
         order = self.inventory_manager.get_earliest_plant_order(self.plant.plant_id)
 
-        self.assertEqual(order.order_id, order_id_2)
+        self.assertEqual(order.order_id, order_2.order_id)
 
         # now add a standalone order that is oldest delivered
         # we need to provide both vendor id and plant id for standalone orders
-        order_id_4 = self.inventory_manager.create_purchase_order(
+        order_4 = self.inventory_manager.create_purchase_order(
             quantity=100, order_date=date.today() - timedelta(days=20), vendor_id=self.vendor.vendor_id,
             plant_id=self.plant.plant_id
         )
-        self.inventory_manager.receive_purchase_order(order_id_4,
-                                                      delivery_date=date.today() - timedelta(days=20))
+        self.inventory_manager.receive_purchase_order(
+            order_4.order_id, delivery_date=date.today() - timedelta(days=20)
+        )
 
         order = self.inventory_manager.get_earliest_plant_order(self.plant.plant_id)
-        self.assertEqual(order.order_id, order_id_4)
+        self.assertEqual(order.order_id, order_4.order_id)
 
     def test_order_quantities_against_parent_agreement_quantity(self):
-        agreement_id = self.inventory_manager.create_purchase_agreement(
+        agreement = self.inventory_manager.create_purchase_agreement(
             plant_id=self.plant.plant_id, vendor_id=self.vendor.vendor_id,
             start=date.today() - timedelta(days=35), end=date.today() + timedelta(days=365), quantity=150
         )
-        order_id_1 = self.inventory_manager.create_purchase_order(
-            quantity=100, order_date=date.today() - timedelta(days=5), agreement_id=agreement_id
+        order_1 = self.inventory_manager.create_purchase_order(
+            quantity=100, order_date=date.today() - timedelta(days=5), agreement_id=agreement.agreement_id
         )
         self.inventory_manager.receive_purchase_order(
-            order_id_1, delivery_date=date.today() - timedelta(days=5)
+            order_1.order_id, delivery_date=date.today() - timedelta(days=5)
         )
 
         with self.assertRaises(OrderQuantityExceedsAgreementException):
             self.inventory_manager.create_purchase_order(
-                quantity=100, order_date=date.today() - timedelta(days=10), agreement_id=agreement_id
+                quantity=100, order_date=date.today() - timedelta(days=10), agreement_id=agreement.agreement_id
             )
 
         # No issues while ordering remaining 50 plants
         self.inventory_manager.create_purchase_order(
-            quantity=50, order_date=date.today() - timedelta(days=10), agreement_id=agreement_id
+            quantity=50, order_date=date.today() - timedelta(days=10), agreement_id=agreement.agreement_id
         )
 
     @parameterized.expand([
@@ -112,26 +116,26 @@ class InventoryManagerTest(unittest.TestCase):
             self, order_date, delivery_date, raises_order_date, raises_delivery_date
     ):
         agreement_start, agreement_end = date.today(), date.today() + timedelta(days=365)
-        agreement_id = self.inventory_manager.create_purchase_agreement(
+        agreement = self.inventory_manager.create_purchase_agreement(
             plant_id=self.plant.plant_id, vendor_id=self.vendor.vendor_id,
             start=agreement_start, end=agreement_end, quantity=150
         )
-        order_id_1 = None
+        order_1 = None
         if raises_order_date:
             with self.assertRaises(PurchaseOrderDateOutsideAgreementDuration):
-                order_id_1 = self.inventory_manager.create_purchase_order(
-                    quantity=100, order_date=order_date, agreement_id=agreement_id
+                order_1 = self.inventory_manager.create_purchase_order(
+                    quantity=100, order_date=order_date, agreement_id=agreement.agreement_id
                 )
         else:
-            order_id_1 = self.inventory_manager.create_purchase_order(
-                quantity=100, order_date=order_date, agreement_id=agreement_id
+            order_1 = self.inventory_manager.create_purchase_order(
+                quantity=100, order_date=order_date, agreement_id=agreement.agreement_id
             )
-        if order_id_1:
+        if order_1:
             if raises_delivery_date:
                 with self.assertRaises(PurchaseOrderDeliveryOutsideAgreementDuration):
-                    self.inventory_manager.receive_purchase_order(order_id_1, delivery_date=delivery_date)
+                    self.inventory_manager.receive_purchase_order(order_1.order_id, delivery_date=delivery_date)
             else:
-                self.inventory_manager.receive_purchase_order(order_id_1, delivery_date=delivery_date)
+                self.inventory_manager.receive_purchase_order(order_1.order_id, delivery_date=delivery_date)
 
 
 if __name__ == '__main__':

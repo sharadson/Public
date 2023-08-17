@@ -19,11 +19,6 @@ class Order(Base):
     # constraints on certain columns
     __table_args__ = (
         CheckConstraint(
-            # Either agreement_id or vendor_id must have a value (not both null)
-            "(agreement_id IS NOT NULL AND vendor_id IS NULL) OR (agreement_id IS NULL AND vendor_id IS NOT NULL)",
-            name="agreement_vendor_check"
-        ),
-        CheckConstraint(
             # Both agreement_id and vendor_id cannot be null at the same time
             "(agreement_id IS NOT NULL OR vendor_id IS NOT NULL)",
             name="agreement_vendor_not_both_null"
@@ -36,12 +31,14 @@ class Order(Base):
     )
 
     order_id = Column(Integer, primary_key=True, autoincrement=True)
+    # we can define these constraints depending on business needs: onupdate="CASCADE", ondelete="CASCADE"
+    # which means what we want to do when the parent record of agreement is updated or deleted
     agreement_id = Column(Integer, ForeignKey('agreement.agreement_id'))
     vendor_id = Column(Integer, ForeignKey('vendor.vendor_id'))
     plant_id = Column(Integer, ForeignKey('plant.plant_id'))
-    order_date = Column(Date)
+    order_date = Column(Date, nullable=False)
     delivery_date = Column(Date)
-    quantity = Column(Integer)
+    quantity = Column(Integer, nullable=False)
     agreement = relationship('Agreement', back_populates='orders')
     vendor = relationship('Vendor', back_populates='orders')
 

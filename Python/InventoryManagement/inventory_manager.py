@@ -62,8 +62,6 @@ class InventoryManager:
         order = Order(
             agreement_id=agreement_id, vendor_id=vendor_id, order_date=order_date, quantity=quantity, plant_id=plant_id
         )
-        order.agreement_id = agreement_id
-        order.vendor_id = vendor_id
 
         self.session.add(order)
         self.session.commit()
